@@ -5,8 +5,9 @@ import numpy as np
 # Load data
 df=pd.read_csv('data/retail_store_sales.csv')
 
-#%%
-# Exploring the data
+#%% Exploring the data
+
+columns = df.columns
 df.describe(include='object')
 
 df['Item'].value_counts()
@@ -16,8 +17,34 @@ df['Location'].value_counts()
 
 #Check for duplicates
 duplicates_id=df[df.duplicated('Transaction ID', keep=False)]
+duplicates_customer=df[df.duplicated('Customer ID', keep=False)]
 
-# %%
+#%% Populate 'Quantity' and 'Total Spent'
+
+df['Quantity']= np.where(
+    df['Quantity'].isna(),
+    df['Total Spent']/df['Price Per Unit'],
+    df['Quantity']
+)
+
+df['Total Spent']= np.where(
+    df['Total Spent'].isna(),
+    df['Quantity']*df['Price Per Unit'],
+    df['Total Spent']
+)
+
+# Change 'Transaction date' to date
+
+df['Transaction Date'] = pd.to_datetime(df['Transaction Date'])
+
+# Replace NA in 'Discount applied' by 'Unknown'
+df['Discount Applied']= np.where(
+    df['Discount Applied'].isna(),
+    'Unknown',
+    df['Discount Applied']
+)
+
+# %% Create a reference table for items and prices
 items_cost =df
 # split the items column in three
 items_cost[['1','item_number','category_code']] = items_cost['Item'].str.split('_', expand=True)
@@ -46,8 +73,8 @@ items_cost = (
 #     .astype('Int64')
 # )
 
-# %%
-# Create reference table for categories
+# %% Create reference table for categories
+
 cat_table= df[['Category','Item']]
 cat_table['cat_code']= (
     cat_table['Item']
@@ -68,7 +95,6 @@ cat_table= (
 df = pd.merge(df,items_cost, on='Price Per Unit')
 df= pd.merge(df,cat_table, on= 'Category')
 
-# %%
 # Fill Item column
 
 df['Item'] = np.where(
@@ -77,4 +103,7 @@ df['Item'] = np.where(
     df['Item']
 )
 
-# %%
+# Leave original columns only
+df = df[columns]
+
+
