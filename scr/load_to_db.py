@@ -1,6 +1,6 @@
 
 
-from main_script import clean_sales_data
+from clean_data import clean_sales_data
 from db_connection import create_db_and_engine
 from dotenv import load_dotenv
 import os

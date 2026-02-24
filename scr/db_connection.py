@@ -1,15 +1,17 @@
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine,text
 
 def create_db_and_engine(user, password, host, port, db_name):
-    # Connect to base default 'postgres'
+    # Connect to default database 'postgres'
     engine_default = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/postgres")
 
     # Create new database
-    engine_default = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/postgres")
-    engine_default.execute("COMMIT")
-    engine_default.execute(f"CREATE DATABASE {db_name}")  # create DB
-    engine_default.dispose()  # cerrar conexión
+    with engine_default.connect() as conn:
+        conn.execute(text("COMMIT"))  
+        conn.execute(text(f"CREATE DATABASE {db_name}"))
+    
+    engine_default.dispose() #close connection
+
 
     # Connect to new database
     engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db_name}")
