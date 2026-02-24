@@ -8,7 +8,16 @@ def create_db_and_engine(user, password, host, port, db_name):
     # Create new database
     with engine_default.connect() as conn:
         conn.execute(text("COMMIT"))  
-        conn.execute(text(f"CREATE DATABASE {db_name}"))
+        
+        # Check if database already exists
+        result = conn.execute(
+            text("SELECT 1 FROM pg_database WHERE datname = :db"),
+            {"db": db_name}
+        )
+        exists = result.scalar() is not None
+
+        if not exists:
+            conn.execute(text(f'CREATE DATABASE "{db_name}"'))
     
     engine_default.dispose() #close connection
 
