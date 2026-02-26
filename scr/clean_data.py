@@ -108,7 +108,7 @@ def clean_sales_data():
     # Select relevant columns
     df = (df[list(columns)+['item_number_y','category_code_y']]
         .rename(columns=lambda x:x.lower().replace(' ','_')) # Clean column names
-        .rename(columns={'item_number_y':'item_id','category_code_y':'category_code'})
+        .rename(columns={'item_number_y':'item_number','category_code_y':'category_code'})
     )
 
     return df

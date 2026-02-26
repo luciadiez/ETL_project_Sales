@@ -1,24 +1,25 @@
 -- #  Create products table
 CREATE TABLE IF NOT EXISTS products (
-    item_id INT NOT NULL,
+    item_number INT NOT NULL,
     item VARCHAR(50),
     category VARCHAR(50),
     category_code VARCHAR(5),
     price_per_unit FLOAT,
-    PRIMARY KEY (item_id)
+    PRIMARY KEY (item)
 );
 
 INSERT INTO products (
-    item_id,
+    item_number,
     item,
     category,
+    category_code,
     price_per_unit
 )
     SELECT distinct 
-            CAST(SUBSTRING(item FROM '_([^_]+)_') AS INT) AS item_id,
+            item_number,
             item,
             category,
-            SUBSTRING(item FROM '[^_]+$') as category_code,
+            category_code,
             price_per_unit
     FROM sales;
 
@@ -37,7 +38,7 @@ INSERT INTO customers(
 -- # Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
     transaction_id VARCHAR NOT NULL,
-    item_id VARCHAR(255),
+    item VARCHAR(255),
     customer_id VARCHAR(50),
     payment_method VARCHAR(50),
     location VARCHAR(255),
@@ -45,13 +46,13 @@ CREATE TABLE IF NOT EXISTS transactions (
     discount_applied  BOOLEAN,
     quantity INT,
     PRIMARY KEY (transaction_id),
-    FOREIGN KEY (item_id) REFERENCES products9(item_id),
+    FOREIGN KEY (item) REFERENCES products(item),
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
 
 INSERT INTO transactions (
-    transaction_id,
-            item_id,
+            transaction_id,
+            item,
             customer_id,
             payment_method,
             location,
@@ -60,7 +61,7 @@ INSERT INTO transactions (
             quantity
 )
     SELECT distinct transaction_id,
-            CAST(SUBSTRING(item FROM '_([^_]+)_') AS INT) as item_id,
+            item,
             customer_id,
             payment_method,
             location,
@@ -68,10 +69,6 @@ INSERT INTO transactions (
             discount_applied,
             quantity
     FROM sales;
-
-
-
-
 
 
 
