@@ -37,14 +37,14 @@ def clean_sales_data():
 
     # Change 'Transaction date' to date
 
-    df['Transaction Date'] = pd.to_datetime(df['Transaction Date'])
+    df['Transaction Date'] = pd.to_datetime(df['Transaction Date']).dt.date
 
-    # Replace NA in 'Discount applied' by 'Unknown'
+    """ # Replace NA in 'Discount applied' by 'Unknown'
     df['Discount Applied']= np.where(
         df['Discount Applied'].isna(),
         'Unknown',
         df['Discount Applied']
-    )
+    ) """
 
     # %% Create a reference table for items and prices
     items_cost =df
@@ -53,7 +53,7 @@ def clean_sales_data():
 
     # check that all items with same number are priced the same
     # there should only be one unique value for price per item
-    items_cost.groupby('item_number')['Price Per Unit'].nunique().max() ==1
+    assert items_cost.groupby('item_number')['Price Per Unit'].nunique().max() ==1
 
     # Create a table with unique values for item and price per unit
     items_cost= items_cost.drop_duplicates(subset=['item_number','Price Per Unit'])[['item_number','Price Per Unit']]
@@ -78,7 +78,7 @@ def clean_sales_data():
     # %% Create reference table for categories
 
     cat_table= df[['Category','Item']]
-    cat_table['cat_code']= (
+    cat_table['category_code']= (
         cat_table['Item']
         .str.split('_')
         .str.get(2)
@@ -86,9 +86,9 @@ def clean_sales_data():
 
     cat_table= (
         cat_table
-        .drop_duplicates(subset=['Category','cat_code'])
+        .drop_duplicates(subset=['Category','category_code'])
         .dropna()
-        [['Category','cat_code']]
+        [['Category','category_code']]
     )
 
     # %%
@@ -101,13 +101,14 @@ def clean_sales_data():
 
     df['Item'] = np.where(
         df['Item'].isna(),
-        'Item_'+df['item_number_y'].astype(str)+ '_'+ df['cat_code'],
+        'Item_'+df['item_number_y'].astype(str)+ '_'+ df['category_code_y'],
         df['Item']
     )
 
-    # Leave original columns only
-    df = (df[columns]
+    # Select relevant columns
+    df = (df[list(columns)+['item_number_y','category_code_y']]
         .rename(columns=lambda x:x.lower().replace(' ','_')) # Clean column names
+        .rename(columns={'item_number_y':'item_id','category_code_y':'category_code'})
     )
 
     return df
