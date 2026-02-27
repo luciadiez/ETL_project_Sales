@@ -79,3 +79,29 @@ sum(quantity*price_per_unit) as total_spent
 FROM transactions
 GROUP BY payment_method
 ORDER by total_spent DESC;
+
+-- Most profitable year/quarter
+
+-- What percentage of each customer’s total spending 
+-- is represented by their single largest purchase 
+-- compared to their overall accumulated spending?
+
+    WITH first_table as (
+    SELECT
+    customer_id,
+    transaction_id,
+    sum(quantity*price_per_unit) as transaction_spent
+    FROM transactions
+    GROUP BY customer_id,transaction_id  
+), max_spent_per_tr as (
+    SELECT
+    ft.customer_id,
+    max(ft.transaction_spent) as max_tr_spent,
+    sum(ft.transaction_spent) as total_spent
+    FROM first_table ft
+    GROUP BY ft.customer_id
+)   SELECT
+    customer_id,
+    CAST((max_tr_spent/total_spent*100) as decimal (5,2)) as perc_max_over_total
+    FROM max_spent_per_tr
+    ORDER BY customer_id;
