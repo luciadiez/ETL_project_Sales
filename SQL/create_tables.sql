@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     transaction_date DATE,
     discount_applied  BOOLEAN,
     quantity INT,
+    price_per_unit FLOAT,
     PRIMARY KEY (transaction_id),
     FOREIGN KEY (item) REFERENCES products(item),
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
@@ -58,7 +59,8 @@ INSERT INTO transactions (
             location,
             transaction_date,
             discount_applied,
-            quantity
+            quantity,
+            price_per_unit
 )
     SELECT distinct transaction_id,
             item,
@@ -67,9 +69,19 @@ INSERT INTO transactions (
             location,
             transaction_date,
             discount_applied,
-            quantity
+            quantity,
+            price_per_unit
     FROM sales;
 
-
-
-
+-- Create dim_date
+CREATE TABLE IF NOT EXISTS dim_date AS
+SELECT
+    cast(date as date) AS date,
+    EXTRACT(YEAR FROM date) AS year,
+    EXTRACT(MONTH FROM date) AS month,
+    EXTRACT(DAY FROM date) AS day,
+    TO_CHAR(date, 'Day') AS day_of_week,
+    CAST(EXTRACT(DOW FROM date) as INT)+1 AS dow,
+    case when CAST(EXTRACT(DOW FROM date) as INT)+1 in (1,7) then 'TRUE'
+        else 'FALSE' end as weekend
+FROM generate_series('2000-01-01'::date, '2030-12-31', '1 day') AS date;
