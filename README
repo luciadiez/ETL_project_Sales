@@ -1,0 +1,67 @@
+# ETL Project – Sales Pipeline
+
+## Overview
+This project demonstrates a simple **end-to-end ETL pipeline** for sales data. 
+The workflow extracts raw data, performs cleaning and transformation, 
+and loads it into structured outputs ready for analysis and visualization. 
+
+## Tools
+- Python: Data transformations and workflow orchestration  
+- SQL (PostgreSQL): Data extraction, table creation, and structured queries  
+- Git: Version control  
+
+## Project Structure
+
+ETL_PROJECT_1/
+├── data/ # Raw CSV file
+├── scr/ # Python scripts for ETL
+│ ├── clean_data.py
+│ ├── db_connection.py
+│ └── load_to_db.py
+├── SQL/ # SQL scripts for creating tables and analysis queries
+│ ├── create_tables.sql
+│ └── analysis.sql
+├── .env # Environment variables for DB connection
+├── requirements.txt
+└── README.md
+
+
+## Workflow
+1. **Extract**  
+   - Load raw sales CSV files into Python.  
+
+2. **Transform**  
+   - Clean and normalize data (dates, categories, missing values).  
+
+3. **Load**  
+   - Connect to PostgreSQL using dynamic parameters from environment variables.
+   - Insert cleaned data into staging table.
+   - Create Star Schema with fact and dimension tables using `create_tables.sql`. 
+      Fact table: transactions, dimensions: customers,dim_date, products.
+
+4. **Analysis**  
+   - Run SQL queries in `analysis.sql` to explore trends and patterns in the sales data. 
+
+## Key Features
+- Clear, modular ETL scripts with a defined execution order.  
+- Uses dynamic parameterization for database connections to improve reusability and portability of the ETL workflow.
+- Fact and dimension tables designed for structured analysis.  
+- Demonstrates integration of Python and PostgreSQL.  
+- Documented workflow for reproducibility.  
+
+## How to Run (work in progress)
+
+1. Clone the repository:  
+```bash
+git clone https://github.com/luciadiez/ETL_project_Sales.git
+cd ETL_project_Sales
+
+2. Install dependencies:
+
+pip install -r requirements.txt
+
+3. Run the ETL workflow:
+
+python scr/load_to_db_py
+
+4. Connect to PostgreSQL and run the queries in SQL/analysis.sql.
